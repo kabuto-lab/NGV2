@@ -1,0 +1,23 @@
+{
+  "name": "next-genium-home-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/sync-archive-assets.mjs",
+    "dev": "astro dev --host 127.0.0.1",
+    "fonts": "node scripts/generate-font-face.mjs",
+    "prebuild": "node scripts/generate-font-face.mjs && node scripts/sync-archive-assets.mjs",
+    "build": "astro build",
+    "editor": "node scripts/preview-editor.mjs",
+    "preview": "astro preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@astrojs/node": "^11.1.7",
+    "@storyblok/astro": "^10.3.2",
+    "astro": "^7.3.2"
+  },
+  "devDependencies": {
+    "vite": "^8.3.4"
+  }
+}

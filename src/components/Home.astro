@@ -1,0 +1,168 @@
+---
+import { storyblokEditable } from '@storyblok/astro';
+
+const { locale = 'en', cms = null, allPages = [] } = Astro.props;
+const ru = locale === 'ru';
+const base = ru ? '../' : './';
+const section = (slug) => `${base}${ru ? 'ru/' : ''}${slug}/`;
+const copy = ru ? {
+  navGames: 'Игры', navStudio: 'Студия', navNews: 'Новости', navContact: 'Связаться',
+  overline: 'Независимая игровая студия / с 2022 года',
+  h1a: 'МИРЫ', h1b: 'ЗА ГРАНЬЮ', h1c: 'ОЖИДАЕМОГО',
+  heroBody: 'Шесть вселенных. Шесть способов потерять чувство времени. Выберите ту, с которой начнёте.',
+  explore: 'Исследовать игры', scroll: 'Листайте вниз', active: 'Сейчас в фокусе',
+  worldsKicker: '01 / Наши миры', worldsTitle: 'Выберите, куда войти.',
+  worldsIntro: 'От космической аномалии до мрачного фэнтези. У каждой игры свои правила и свой голос.',
+  viewGame: 'Открыть игру', fullLineup: 'Все игры',
+  studioKicker: '02 / Студия', studioTitleA: 'МЫ СОЗДАЁМ', studioTitleB: 'МИРЫ, В КОТОРЫХ', studioTitleC: 'ХОЧЕТСЯ ОСТАТЬСЯ.',
+  studioBody: 'Next Genium — независимая команда, основанная в 2022 году. Мы работаем над играми для ПК и консолей: от научной фантастики до тёмного фэнтези. Каждый проект — отдельная вселенная с собственной историей.',
+  studioLink: 'О студии', factA: 'игровых миров', factB: 'год основания', factC: 'общая одержимость — игры',
+  newsKicker: '03 / Из студии', newsTitle: 'Сигналы из новых миров.', newsIntro: 'Обновления, демоверсии и события — из материалов сайта студии.', newsLink: 'Открыть новость', allNews: 'Все новости',
+  contactKicker: 'Связь', contactTitle: 'Есть идея для нового мира?', contactBody: 'Партнёрства, пресса и любые вопросы — пишите команде.', contactAction: 'Написать нам',
+  backTop: 'Наверх', archiveNote: 'Next Genium / новые миры', menu: 'Меню', closeMenu: 'Закрыть меню', langLabel: 'Язык'
+} : {
+  navGames: 'Games', navStudio: 'Studio', navNews: 'News', navContact: 'Contact',
+  overline: 'Independent game studio / Est. 2022',
+  h1a: 'WORLDS', h1b: 'BEYOND', h1c: 'THE EXPECTED',
+  heroBody: 'Six universes. Six ways to lose track of time. Choose the one where your journey begins.',
+  explore: 'Explore the games', scroll: 'Scroll to discover', active: 'Now in focus',
+  worldsKicker: '01 / Our worlds', worldsTitle: 'Choose your next world.',
+  worldsIntro: 'From cosmic anomalies to dark fantasy. Every game has its own rules and its own voice.',
+  viewGame: 'Enter the world', fullLineup: 'All games',
+  studioKicker: '02 / The studio', studioTitleA: 'WE MAKE', studioTitleB: 'WORLDS YOU', studioTitleC: 'WANT TO STAY IN.',
+  studioBody: 'Next Genium is an independent team founded in 2022. We create games for PC and consoles, from science fiction to dark fantasy. Each project is a universe with a story of its own.',
+  studioLink: 'About the studio', factA: 'game worlds', factB: 'studio founded', factC: 'shared obsession: games',
+  newsKicker: '03 / From the studio', newsTitle: 'Signals from new worlds.', newsIntro: 'Updates, demos and events from the studio’s own site.', newsLink: 'Read the story', allNews: 'All news',
+  contactKicker: 'Get in touch', contactTitle: 'Have a world in mind?', contactBody: 'Partnerships, press or a simple question — the team is listening.', contactAction: 'Write to us',
+  backTop: 'Back to top', archiveNote: 'Next Genium / new worlds', menu: 'Menu', closeMenu: 'Close menu', langLabel: 'Language'
+};
+if (cms) {
+  for (const key of Object.keys(copy)) {
+    if (typeof cms[key] === 'string') copy[key] = cms[key];
+  }
+}
+const games = [
+  { id: 'overmind', title: '14: Overmind', genre: ru ? 'Космическое выживание' : 'Sci-fi survival', image: 'overmind-hero-redraw.webp', heroImage: 'overmind-hero-redraw.webp', desc: ru ? 'Аномальный космос, где физика меняет правила, а единственный союзник — ИИ S.A.M.' : 'An anomalous universe where physics changes the rules and your only ally is the AI S.A.M.' },
+  { id: 'whatever-it-takes', title: 'Whatever It Takes', genre: ru ? 'Тёмное фэнтези / RPG' : 'Dark fantasy / RPG', image: 'whatever-world.png', desc: ru ? 'Падший бог возвращается в мир боли, предательства и забытых истин.' : 'A fallen god returns to a world of pain, betrayal and forgotten truths.' },
+  { id: 'dungeon-dominator', title: 'Dungeon Dominator', genre: ru ? 'Симулятор бога' : 'God simulator', image: 'dungeon-world.jpg', desc: ru ? 'Постройте логово зла и наблюдайте, как живут его обитатели.' : 'Build a lair of evil and watch its denizens live their own lives.' },
+  { id: 'formind', title: 'Formind', genre: ru ? 'Хоррор / выживание' : 'Survival horror', image: 'formind-world.webp', desc: ru ? 'Проснитесь на подводной станции, где чудовища учатся на каждой вашей ошибке.' : 'Wake on an underwater station where monsters learn from every mistake.' },
+  { id: 'godreaper', title: 'Godreaper', genre: ru ? 'Экшен / славянское фэнтези' : 'Action / Slavic fantasy', image: 'godreaper-world.webp', desc: ru ? 'Тёмное приключение по мотивам славянского фольклора.' : 'A dark adventure inspired by Slavic folklore.' },
+  { id: 'blue-book', title: 'Blue Book', genre: ru ? 'Детектив / визуальная новелла' : 'Detective / visual novel', image: 'bluebook-world.webp', desc: ru ? 'Канзас, 1980-е. Пропажи людей и слухи об НЛО ведут к одному расследованию.' : 'Kansas in the 1980s. Missing people and UFO rumours lead to one investigation.' }
+];
+const featured = games.slice(0, 3);
+const heroBackground = cms?.hero_background?.filename || `${base}assets/overmind-background-volumetric.png`;
+const heroMonolith = cms?.hero_monolith?.filename || `${base}assets/overmind-monolith-cinematic.png`;
+const news = ru ? [
+  { title: 'Демоверсия Whatever It Takes уже в Steam', href: 'news/demoversija-whatever-it-takes-teper-dostupna-v-steam-skachivajte-i-igrajte/index.html', label: 'Демоверсия' },
+  { title: 'Blue Book: обновлённая демоверсия и новые карты', href: 'news/blue-book-grjadet-demo-2-0-s-masshtabnymi-obnovlenijami-i-novymi-kartami/index.html', label: 'Разработка' },
+  { title: '14: Overmind — 5 000 добавлений в желаемое', href: 'news/news5/index.html', label: 'Событие' }
+] : [
+  { title: 'The Whatever It Takes demo is now on Steam', href: 'news/demoversija-whatever-it-takes-teper-dostupna-v-steam-skachivajte-i-igrajte/index.html', label: 'Playable now' },
+  { title: 'Blue Book: Demo 2.0 brings major updates', href: 'news/blue-book-grjadet-demo-2-0-s-masshtabnymi-obnovlenijami-i-novymi-kartami/index.html', label: 'In development' },
+  { title: '14: Overmind reaches 5,000 Steam wishlists', href: 'news/news5/index.html', label: 'Milestone' }
+];
+for (const item of news) {
+  const slug = item.href.split('/')[1];
+  const article = allPages.find((page) => page.route === `${ru ? 'ru/' : ''}news/${slug}`);
+  if (article) item.title = article.title.replace(/\s+[—–-]\s+Next Genium$/, '');
+}
+const featuredNews = allPages.filter((page) => page.locale === locale && page.section === 'news' && page.featured)
+  .sort((a, b) => (b.publishedAt || '').localeCompare(a.publishedAt || ''))
+  .slice(0, 3)
+  .map((page) => ({
+    title: page.title.replace(/\s+[—–-]\s+Next Genium$/, ''),
+    href: `news/${page.slug}/index.html`,
+    label: page.cardLabel || (ru ? 'Новость' : 'News'),
+  }));
+if (featuredNews.length) {
+  const slugs = new Set(featuredNews.map((item) => item.href));
+  news.splice(0, news.length, ...featuredNews, ...news.filter((item) => !slugs.has(item.href)).slice(0, 3 - featuredNews.length));
+}
+---
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101410" />
+    <meta name="description" content={cms?.seo_description || (ru ? 'Next Genium — независимая студия игр для ПК и консолей. Шесть миров на стыке научной фантастики, хоррора и фэнтези.' : 'Next Genium is an independent game studio creating six worlds across science fiction, horror and fantasy.')} />
+    <title>{cms?.seo_title || (ru ? 'Next Genium — Миры за гранью ожидаемого' : 'Next Genium — Worlds Beyond the Expected')}</title>
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <link rel="stylesheet" href={`${base}style.css`} />
+    <link rel="stylesheet" href={`${base}font-face.css`} />
+    <link rel="stylesheet" href={`${base}typography.css`} />
+    <link rel="stylesheet" href={`${base}inner.css`} />
+    <link rel="stylesheet" href={`${base}spec.css`} />
+    <link rel="stylesheet" href={`${base}image-editor.css`} />
+    <link rel="preload" href={heroBackground} as="image" fetchpriority="high" />
+    <link rel="preload" href={heroMonolith} as="image" fetchpriority="high" />
+    <script src={`${base}app.js`} defer></script>
+    <script src={`${base}image-editor.js`} defer></script>
+    {ru && <script is:inline>if (location.pathname.endsWith('/ru/index.html')) location.replace(location.pathname.slice(0, -10) + location.search + location.hash);</script>}
+  </head>
+  <body {...(cms ? storyblokEditable(cms) : {})}>
+    <a class="skip-link" href="#main">{ru ? 'К содержанию' : 'Skip to content'}</a>
+    <header class="site-header" id="top">
+      <a class="brand" href="#top" aria-label="Next Genium"><img class="brand-logo" src={`${base}assets/L1.svg`} alt="Next Genium" width="1516" height="129" /></a>
+      <nav class="site-nav" id="site-nav" aria-label={ru ? 'Основная навигация' : 'Main navigation'}>
+        <a href={section('games')}>{copy.navGames}</a><a href={section('lor')}>{ru ? 'Лор' : 'Lore'}</a><a href={section('about')}>{ru ? 'О нас' : 'About'}</a><a href={section('careers')}>{ru ? 'Карьера' : 'Careers'}</a><a href={section('news')}>{copy.navNews}</a><a href={section('download')}>{ru ? 'Скачать' : 'Download'}</a><a href={section('partner')}>{ru ? 'Партнёрства' : 'Partners'}</a><a class="nav-mobile-only" href={section('contacts')}>{copy.navContact}</a>
+      </nav>
+      <div class="header-end">
+        <div class="lang-switch" aria-label={copy.langLabel}><a href={ru ? '../index.html' : './index.html'} aria-current={!ru ? 'page' : undefined}>EN</a><span>/</span><a href={ru ? './index.html' : './ru/index.html'} aria-current={ru ? 'page' : undefined}>RU</a></div>
+        <a class="header-contact" href={section('contacts')}>{copy.navContact}<span aria-hidden="true">↗</span></a>
+        <button class="menu-button" type="button" aria-label={copy.menu} aria-expanded="false" aria-controls="site-nav"><span></span><span></span></button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <div class="hero-topline"><span class="signal-dot"></span>{copy.overline}</div>
+          <div class="hero-headline-wrap"><span class="hero-index">NG—001 / 006</span><h1 id="hero-title"><span>{copy.h1a}</span><span class="italic">{copy.h1b}</span><span>{copy.h1c}<i>.</i></span></h1></div>
+          <div class="hero-bottom"><p>{copy.heroBody}</p><a class="circle-link" href="#worlds" aria-label={copy.explore}>↘</a></div>
+          <div class="hero-side-note">{copy.scroll} <span aria-hidden="true">↓</span></div>
+        </div>
+        <div class="hero-scene" data-hero-scene data-active-game="overmind">
+          <img id="hero-image" src={`${base}assets/${featured[1].heroImage ?? featured[1].image}`} alt={featured[1].title} aria-hidden="true" width="1971" height="798" />
+          <div class="overmind-layers" role="img" aria-label="14: Overmind">
+            <img class="overmind-background" src={heroBackground} alt="" aria-hidden="true" width="1086" height="1448" />
+            <div class="overmind-object" aria-hidden="true">
+              <img class="overmind-monolith" src={heroMonolith} alt="" width="1086" height="1448" />
+              <span class="overmind-core"></span>
+              <span class="hero-flare"></span>
+            </div>
+          </div>
+          <div class="scene-grid" aria-hidden="true"></div>
+          <div class="scene-corner scene-corner-tl" aria-hidden="true"></div><div class="scene-corner scene-corner-br" aria-hidden="true"></div>
+          <div class="scene-label"><span>{copy.active} / <span id="scene-count">01</span></span><strong id="scene-title">{featured[0].title}</strong><a id="scene-link" href={section(`games/${featured[0].id}`)} data-action={copy.viewGame} aria-label={`${copy.viewGame}: ${featured[0].title}`}>↗</a></div>
+          <div class="scene-controls" aria-label={ru ? 'Выбор игры' : 'Choose a game'}>
+            {featured.map((game, i) => <button type="button" class={i === 0 ? 'scene-button is-active' : 'scene-button'} aria-pressed={i === 0 ? 'true' : 'false'} data-game={game.id} data-image={`${base}assets/${game.heroImage ?? game.image}`} data-title={game.title} data-url={section(`games/${game.id}`)} data-index={String(i + 1).padStart(2, '0')} data-alt={game.title}><span>{String(i + 1).padStart(2, '0')}</span><strong>{game.title}</strong><i></i></button>)}
+          </div>
+        </div>
+      </section>
+
+      <section class="worlds section-shell" id="worlds" aria-labelledby="worlds-title">
+        <div class="section-heading"><span class="eyebrow">{copy.worldsKicker}</span><div><h2 id="worlds-title">{copy.worldsTitle}</h2><p>{copy.worldsIntro}</p></div></div>
+        <div class="world-grid">
+          {games.map((game, i) => <a class={`world-card world-card-${i + 1}`} href={section(`games/${game.id}`)}>
+            <div class="world-image"><img src={`${base}assets/${game.image}`} alt="" loading="lazy" /><span class="world-count">{String(i + 1).padStart(2, '0')} / 06</span><span class="world-arrow" aria-hidden="true">↗</span></div>
+            <div class="world-info"><div><span class="world-genre">{game.genre}</span><h3>{game.title}</h3></div><p>{game.desc}</p></div>
+          </a>)}
+        </div>
+        <a class="section-tail" href={section('games')}>{copy.fullLineup}<span aria-hidden="true">↗</span></a>
+      </section>
+
+      <section class="studio" id="studio" aria-labelledby="studio-title"><div class="studio-inner"><span class="eyebrow">{copy.studioKicker}</span><div class="studio-center"><h2 id="studio-title"><span>{copy.studioTitleA}</span><span>{copy.studioTitleB}</span><em>{copy.studioTitleC}</em></h2><div class="studio-description"><p>{copy.studioBody}</p><a href={section('about')}>{copy.studioLink} <span aria-hidden="true">↗</span></a></div></div><div class="studio-facts"><div><strong>06</strong><span>{copy.factA}</span></div><div><strong>2022</strong><span>{copy.factB}</span></div><div><strong>∞</strong><span>{copy.factC}</span></div></div></div><div class="studio-outline" aria-hidden="true">NG</div></section>
+
+      <section class="news section-shell" id="news" aria-labelledby="news-title"><div class="section-heading news-heading"><span class="eyebrow">{copy.newsKicker}</span><div><h2 id="news-title">{copy.newsTitle}</h2><p>{copy.newsIntro}</p></div></div><div class="news-list">{news.map((item, i) => <a href={section(item.href.replace(/\/index\.html$/, ''))} class="news-item"><span class="news-no">{String(i + 1).padStart(2, '0')}</span><span class="news-text"><small>{item.label}</small><strong>{item.title}</strong></span><span class="news-arrow" aria-label={copy.newsLink}>↗</span></a>)}</div><a class="section-tail" href={section('news')}>{copy.allNews}<span aria-hidden="true">↗</span></a></section>
+
+      <section class="contact" id="contact" aria-labelledby="contact-title"><span class="eyebrow">04 / {copy.contactKicker}</span><div><h2 id="contact-title">{copy.contactTitle}</h2><div class="contact-bottom"><p>{copy.contactBody}</p><a href={section('contacts')}>{copy.contactAction}<span aria-hidden="true">↗</span></a></div></div></section>
+    </main>
+    <footer class="site-footer inner-footer">
+      <a class="brand footer-brand" href="#top" aria-label="Next Genium"><img class="brand-logo" src={`${base}assets/L1.svg`} alt="Next Genium" width="1516" height="129" /></a>
+      <div class="inner-footer-links"><a href={section('games')}>{copy.navGames}</a><a href={section('lor')}>{ru ? 'Лор' : 'Lore'}</a><a href={section('about')}>{ru ? 'О нас' : 'About'}</a><a href={section('careers')}>{ru ? 'Карьера' : 'Careers'}</a><a href={section('news')}>{copy.navNews}</a><a href={section('download')}>{ru ? 'Скачать' : 'Download'}</a><a href={section('partner')}>{ru ? 'Партнёрства' : 'Partnerships'}</a><a href={section('contacts')}>{copy.navContact}</a></div>
+      <div class="inner-footer-legal"><a href={section('policy')}>{ru ? 'Обработка данных' : 'Data processing'}</a><a href={section('privacy-policy')}>Privacy Policy</a><a href={section('privacy-policy-uae')}>Privacy Policy UAE</a><a href={section('terms-of-use')}>Terms of Use</a><a href={section('fan-content-policy')}>Fan Content Policy</a></div>
+      <span>{copy.archiveNote} · <a href="#top">{copy.backTop} ↑</a></span>
+    </footer>
+  </body>
+</html>

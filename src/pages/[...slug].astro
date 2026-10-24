@@ -1,0 +1,12 @@
+---
+import InnerPage from '../components/InnerPage.astro';
+import { getAllPages } from '../lib/storyblok-content.mjs';
+
+export async function getStaticPaths() {
+  const allPages = await getAllPages();
+  return allPages.map((entry) => ({ params: { slug: entry.route }, props: { entry, allPages } }));
+}
+
+const { entry, allPages } = Astro.props;
+---
+<InnerPage entry={entry} allPages={allPages} />

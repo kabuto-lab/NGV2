@@ -1,0 +1,88 @@
+---
+const { locale = 'en', policyHref = '../policy/' } = Astro.props;
+const ru = locale === 'ru';
+const copy = ru ? {
+  title: 'Откликнуться', intro: 'Оставьте контакты для первого разговора с командой.',
+  fullTitle: 'Анкета соискателя', fullIntro: 'Полная анкета для оформления в команду. Заполняйте её, когда сотрудники студии попросят вас об этом.',
+  name: 'Имя и фамилия', role: 'Должность', email: 'Электронная почта', telegram: 'Telegram',
+  social: 'Социальные сети', birth: 'Дата рождения', citizenship: 'Гражданство',
+  address: 'Адрес регистрации', phone: 'Телефон', passport: 'Паспортные данные',
+  education: 'Образование', languages: 'Иностранные языки и уровень владения',
+  history: 'Опыт работы: последние пять мест, даты, должности и причины увольнения',
+  consent: 'Согласен на обработку персональных данных согласно', policy: 'политике обработки данных',
+  send: 'Отправить заявку', openFull: 'Открыть полную анкету', sending: 'Отправляем…',
+  success: 'Заявка отправлена. Спасибо!', invalid: 'Проверьте выделенные поля и попробуйте ещё раз.',
+  fail: 'Не удалось отправить заявку. Попробуйте позже или напишите на hr@next-genium.com.',
+  privacy: 'Поля анкеты содержат личные данные. Отправляйте её только через эту защищённую форму.'
+} : {
+  title: 'Apply to the team', intro: 'Leave your contacts so the team can get in touch.',
+  fullTitle: 'Candidate questionnaire', fullIntro: 'The full questionnaire is for joining the team. Please complete it when the studio asks you to.',
+  name: 'Full name', role: 'Position', email: 'Email', telegram: 'Telegram',
+  social: 'Social media', birth: 'Date of birth', citizenship: 'Citizenship',
+  address: 'Registered address', phone: 'Phone number', passport: 'Passport details',
+  education: 'Education', languages: 'Foreign languages and proficiency',
+  history: 'Employment history: last five roles, dates, positions and reasons for leaving',
+  consent: 'I consent to the processing of my personal data under the', policy: 'data processing policy',
+  send: 'Submit application', openFull: 'Open full questionnaire', sending: 'Sending…',
+  success: 'Application sent. Thank you!', invalid: 'Check the highlighted fields and try again.',
+  fail: 'Could not send the application. Please try later or email hr@next-genium.com.',
+  privacy: 'This questionnaire contains personal details. Submit it only through this secure form.'
+};
+---
+<section class="career-forms" id="apply">
+  <div class="career-forms-heading"><span>02 / {ru ? 'КАРЬЕРА' : 'CAREERS'}</span><h2>{copy.title}</h2></div>
+  <div class="career-forms-layout">
+    <div class="career-forms-intro"><p>{copy.intro}</p><a href="mailto:hr@next-genium.com">hr@next-genium.com ↗</a></div>
+    <div class="career-forms-main">
+      <form class="career-form" data-career-form="short" data-sending={copy.sending} data-success={copy.success} data-invalid={copy.invalid} data-fail={copy.fail} action="/api/careers/short" method="post">
+        <input type="hidden" name="_wpcf7" value="12" />
+        <input type="hidden" name="_wpcf7_version" value="6.1.4" />
+        <input type="hidden" name="_wpcf7_locale" value="ru_RU" />
+        <input type="hidden" name="_wpcf7_unit_tag" value="wpcf7-f12-p5217-o1" />
+        <input type="hidden" name="_wpcf7_container_post" value="5217" />
+        <input type="hidden" name="_wpcf7_recaptcha_response" value="" />
+        <input type="hidden" name="trp-form-language" value={locale} />
+        <div class="career-form-grid">
+          <label>{copy.name}<input name="namew" type="text" maxlength="400" autocomplete="name" required /></label>
+          <label>{copy.email}<input name="email" type="email" maxlength="400" autocomplete="email" required /></label>
+          <label>{copy.telegram}<input name="tg" type="text" maxlength="400" required /></label>
+        </div>
+        <p class="career-form-consent">{ru ? 'Отправляя заявку, вы принимаете ' : 'By submitting, you accept the '}<a href={policyHref}>{copy.policy}</a>.</p>
+        <button type="submit">{copy.send}<span aria-hidden="true">↗</span></button>
+        <p class="career-form-status" role="status" aria-live="polite"></p>
+      </form>
+      <details class="career-full">
+        <summary>{copy.openFull}<span aria-hidden="true">＋</span></summary>
+        <div class="career-full-body"><h3>{copy.fullTitle}</h3><p>{copy.fullIntro}</p><p class="career-privacy-note">{copy.privacy}</p>
+          <form class="career-form" data-career-form="full" data-sending={copy.sending} data-success={copy.success} data-invalid={copy.invalid} data-fail={copy.fail} action="/api/careers/full" method="post">
+            <input type="hidden" name="_wpcf7" value="7782" />
+            <input type="hidden" name="_wpcf7_version" value="6.1.4" />
+            <input type="hidden" name="_wpcf7_locale" value="ru_RU" />
+            <input type="hidden" name="_wpcf7_unit_tag" value="wpcf7-f7782-p5217-o2" />
+            <input type="hidden" name="_wpcf7_container_post" value="5217" />
+            <input type="hidden" name="_wpcf7_recaptcha_response" value="" />
+            <input type="hidden" name="trp-form-language" value={locale} />
+            <div class="career-form-grid">
+              <label>{copy.name}<input name="namew" type="text" maxlength="400" autocomplete="name" required /></label>
+              <label>{copy.role}<input name="job_title" type="text" maxlength="400" required /></label>
+              <label>{copy.email}<input name="email" type="email" maxlength="400" autocomplete="email" required /></label>
+              <label>{copy.social}<input name="social_media" type="text" maxlength="400" /></label>
+              <label>{copy.birth}<input name="date_birth" type="date" autocomplete="bday" required /></label>
+              <label>{copy.citizenship}<input name="citizenship" type="text" maxlength="400" required /></label>
+              <label class="career-span">{copy.address}<input name="address" type="text" maxlength="400" autocomplete="street-address" required /></label>
+              <label>{copy.phone}<input name="phone" type="tel" maxlength="400" autocomplete="tel" required /></label>
+              <label class="career-span">{copy.passport}<input name="passport" type="text" maxlength="400" required /></label>
+              <label class="career-span">{copy.education}<input name="education" type="text" maxlength="400" required /></label>
+              <label class="career-span">{copy.languages}<input name="languages" type="text" maxlength="400" required /></label>
+              <label class="career-span">{copy.history}<textarea name="work_activity" maxlength="2000" rows="6" required></textarea></label>
+            </div>
+            <label class="career-checkbox"><input name="acceptance" type="checkbox" value="1" required /><span>{copy.consent} <a href={policyHref}>{copy.policy}</a>.</span></label>
+            <button type="submit">{copy.send}<span aria-hidden="true">↗</span></button>
+            <p class="career-form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+<script src="/career-forms.js" defer></script>

@@ -1,0 +1,261 @@
+---
+import pages from '../data/pages.json';
+import { storyblokEditable } from '@storyblok/astro';
+import CareerForms from './CareerForms.astro';
+
+const { entry, allPages = pages } = Astro.props;
+const ru = entry.locale === 'ru';
+const base = '../'.repeat(entry.depth);
+const siteAssets = `${base}assets/archive/`;
+const asset = (value) => value?.replace('__SITE_ASSETS__', siteAssets);
+const path = (slug) => `${base}${ru ? 'ru/' : ''}${slug}/`;
+const isListing = entry.slug === entry.section;
+const otherRoute = ru ? entry.route.replace(/^ru\//, '') : `ru/${entry.route}`;
+const otherHref = `${base}${otherRoute}/`;
+const labels = ru ? {
+  home: 'Главная', games: 'Игры', lore: 'Лор', about: 'О нас', careers: 'Карьера',
+  news: 'Новости', download: 'Скачать', partner: 'Партнёрства', contacts: 'Контакты',
+  read: 'Читать', explore: 'Открыть мир', back: 'Все игры', allNews: 'Все новости',
+  contact: 'Написать нам', details: 'Подробности', source: 'Материалы из архива Next Genium',
+  channels: 'Каналы связи', external: 'Ссылки и ресурсы', apply: 'Написать по поводу работы',
+  coming: 'Следите за релизами', menu: 'Меню', text: 'Оригинальный текст'
+} : {
+  home: 'Home', games: 'Games', lore: 'Lore', about: 'About', careers: 'Careers',
+  news: 'News', download: 'Download', partner: 'Partnerships', contacts: 'Contacts',
+  read: 'Read story', explore: 'Enter the world', back: 'All games', allNews: 'All news',
+  contact: 'Get in touch', details: 'Details', source: 'From the Next Genium archive',
+  channels: 'Contact channels', external: 'Links and resources', apply: 'Ask about a role',
+  coming: 'Follow the releases', menu: 'Menu', text: 'Original text'
+};
+const titles = {
+  games: labels.games, lor: labels.lore, about: labels.about, careers: labels.careers,
+  news: labels.news, download: labels.download, partner: labels.partner, contacts: labels.contacts,
+  policy: ru ? 'Обработка данных' : 'Data processing',
+  'privacy-policy': 'Privacy Policy', 'privacy-policy-uae': 'Privacy Policy UAE',
+  'terms-of-use': 'Terms of Use', 'fan-content-policy': 'Fan Content Policy'
+};
+const title = entry.cmsBlok?.title || (isListing ? titles[entry.section] : entry.title.replace(/\s+[—–-]\s+Next Genium$/, ''));
+const introduction = isListing ? {
+  games: ru ? 'Шесть разных миров. В каждом — свои правила.' : 'Six worlds. Each plays by its own rules.',
+  lor: ru ? 'Истории и хронологии игровых вселенных.' : 'Stories and timelines from the game worlds.',
+  about: ru ? 'Люди, идеи и игры, с которых всё началось.' : 'The people, ideas and games behind the studio.',
+  careers: ru ? 'Собираем команду, которая создаёт новые миры.' : 'Join the people building our next worlds.',
+  news: ru ? 'События, обновления и релизы студии.' : 'Updates, releases and stories from the studio.',
+  download: ru ? 'Игры и демоверсии Next Genium.' : 'Games and demos from Next Genium.',
+  partner: ru ? 'Создаём новые возможности вместе.' : 'Building new opportunities together.',
+  contacts: ru ? 'Есть вопрос или предложение? Пишите команде.' : 'A question or an idea? Talk to the team.'
+}[entry.section] : '';
+const nav = [
+  ['games', labels.games], ['lor', labels.lore], ['about', labels.about], ['careers', labels.careers],
+  ['news', labels.news], ['download', labels.download], ['partner', labels.partner]
+];
+const games = [
+  ['overmind', '14: Overmind', 'overmind-hero-redraw.webp'],
+  ['whatever-it-takes', 'Whatever It Takes', 'whatever-world.png'],
+  ['dungeon-dominator', 'Dungeon Dominator', 'dungeon-world.jpg'],
+  ['formind', 'Formind', 'formind-world.webp'],
+  ['godreaper', 'Godreaper', 'godreaper-world.webp'],
+  ['blue-book', 'Blue Book', 'bluebook-world.webp']
+];
+const articles = allPages.filter((p) => p.locale === entry.locale && p.section === 'news' && p.slug !== 'news');
+const newsOrder = ['obnovlenie-0-15', 'patch-1-0-1', 'demoversija-whatever-it-takes', 'blue-book-grjadet', '14-overmind-gotovitsja', 'news5', 'news-4', 'news-3', 'news-2', 'news-1'];
+articles.sort((a, b) => newsOrder.findIndex((n) => a.slug.startsWith(n)) - newsOrder.findIndex((n) => b.slug.startsWith(n)));
+const isDetail = !isListing;
+const isGameDetail = entry.section === 'games' && isDetail;
+const isNewsDetail = entry.section === 'news' && isDetail;
+const isLegal = ['policy', 'privacy-policy', 'privacy-policy-uae', 'terms-of-use', 'fan-content-policy'].includes(entry.section);
+const isPartnerPage = entry.section === 'partner' && isListing;
+const partnerNames = ['Learnmore', 'Hard Days', 'Skillbox', 'EXPERT.LVL', 'Snap Security'];
+const partnerUrls = ['https://learnmore.tech/', 'https://harddays.dev/', 'https://skillbox.ru/', 'https://vk.com/russiangameindustry', 'https://snapsecurity.org/'];
+const partnerCards = isPartnerPage ? entry.blocks.flatMap((block, i) => block.type === 'image' && entry.blocks[i + 1]?.type === 'heading'
+  ? [{ image: block.src, title: entry.blocks[i + 1].text }]
+  : []).slice(0, partnerNames.length).map((partner, i) => ({ ...partner, title: partnerNames[i], href: partnerUrls[i] })) : [];
+const customGameHero = entry.section === 'games' && (isListing || entry.slug === 'overmind');
+let usedHero = false;
+let usedTitle = false;
+const bodyBlocks = entry.blocks.filter((b) => {
+  if (!customGameHero && !usedHero && b.type === 'image' && b.src === entry.hero) {
+    usedHero = true;
+    return false;
+  }
+  if (!usedTitle && b.type === 'heading' && b.text.toLocaleLowerCase() === title.toLocaleLowerCase()) {
+    usedTitle = true;
+    return false;
+  }
+  return true;
+});
+const firstCompleteSentence = (value = '') => value.match(/^.*?[.!?](?=\s|$)/u)?.[0] || value;
+const summary = entry.description || introduction || (isDetail ? firstCompleteSentence(entry.blocks.find((b) => b.type === 'paragraph' && b.text.length > 35)?.text) : '') || '';
+const heroImage = isPartnerPage ? null : customGameHero ? `${base}assets/overmind-hero-redraw.webp` : asset(entry.hero);
+const hasBody = !['games', 'news', 'contacts', 'download'].includes(entry.section) || isDetail;
+const recommendationStart = (isGameDetail || isNewsDetail) ? bodyBlocks.findIndex((block) => block.type === 'heading' && /(?:Вам может быть интересно|You may be interested in)/i.test(block.text)) : -1;
+const articleBlocks = recommendationStart >= 0 ? bodyBlocks.slice(0, recommendationStart) : bodyBlocks;
+const gameImages = isGameDetail ? articleBlocks.filter((block) => block.type === 'image') : [];
+const galleryImages = gameImages.slice(3);
+const aboutImages = entry.section === 'about' ? articleBlocks.filter((block) => block.type === 'image') : [];
+const proseBlocks = articleBlocks.filter((block) => entry.section === 'about' ? block.type !== 'image' : !isGameDetail || block.type !== 'image' || gameImages.indexOf(block) < 3);
+const gameLinks = isGameDetail ? entry.links.filter((link) => /^(Steam|Demo)$/i.test(link.label) && /^https:\/\//.test(link.href)) : [];
+const otherGames = isGameDetail ? games.filter(([slug]) => slug !== entry.slug) : [];
+const relatedArticles = isNewsDetail ? articles.filter((article) => article.slug !== entry.slug).slice(0, 3) : [];
+const loreSections = entry.section === 'lor' ? (ru ? ['Whatever it takes', 'FORMIND', '14: Overmind', 'Spider Matrix'] : ['Whatever it takes', 'FORMIND', '14: Overmind', 'Spider Matrix']) : [];
+const loreId = (name) => ({ 'Whatever it takes': 'whatever-it-takes', FORMIND: 'formind', '14: Overmind': 'overmind', 'Spider Matrix': 'spider-matrix' })[name];
+const teamContacts = ru ? [
+  ['Лера', '@nextgen_lera_hr', 'https://t.me/nextgen_lera_hr'],
+  ['Марк', '@nextgen_hr_mark', 'https://t.me/nextgen_hr_mark'],
+  ['Кирилл', '@nextg_hr_kirill', 'https://t.me/nextg_hr_kirill'],
+  ['Александр', '@Nextgen_pr_alex', 'https://t.me/Nextgen_pr_alex']
+] : [
+  ['Lera', '@nextgen_lera_hr', 'https://t.me/nextgen_lera_hr'],
+  ['Mark', '@nextgen_hr_mark', 'https://t.me/nextgen_hr_mark'],
+  ['Kirill', '@nextg_hr_kirill', 'https://t.me/nextg_hr_kirill'],
+  ['Alexander', '@Nextgen_pr_alex', 'https://t.me/Nextgen_pr_alex']
+];
+const careerList = (value) => {
+  if (!value?.startsWith('- ') && !/:\s*-/u.test(value)) return null;
+  const parts = value.replace(/^-\s+/u, '').split(/\s+-\s+/u).map((part) => part.trim()).filter(Boolean);
+  return parts.length > 1 ? { intro: value.startsWith('- ') ? '' : parts.shift(), items: parts } : null;
+};
+const legalTextParts = (value) => value.split(/(https?:\/\/[^\s]+|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/giu).filter(Boolean).map((part) => {
+  const isUrl = /^https?:\/\//iu.test(part);
+  const isEmail = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/iu.test(part);
+  if (!isUrl && !isEmail) return { text: part };
+  const cleanPart = part.replace(/[.,;:)]+$/u, '');
+  const suffix = part.slice(cleanPart.length);
+  if (isEmail) return { text: cleanPart, href: `mailto:${cleanPart}`, suffix };
+  const url = new URL(cleanPart);
+  const localPath = url.pathname.replace(/^\/en(?=\/|$)/u, '').replace(/^\/+|\/+$/gu, '');
+  const href = url.hostname === 'next-genium.com' ? `${base}${localPath}${localPath ? '/' : ''}` : cleanPart;
+  return { text: cleanPart, href, suffix };
+});
+const contactRows = ru ? [
+  ['Общие вопросы', 'info@next-genium.com'], ['Пресса и PR', 'pr@next-genium.com'],
+  ['Жалобы и предложения', 'complaints@next-genium.com'], ['Карьера', 'hr@next-genium.com']
+] : [
+  ['General enquiries', 'info@next-genium.com'], ['Press and PR', 'pr@next-genium.com'],
+  ['Feedback', 'complaints@next-genium.com'], ['Careers', 'hr@next-genium.com']
+];
+const socialLinks = entry.links.filter((l) => /t\.me|facebook|youtube|vk\.com|reddit|x\.com|tiktok|discord/i.test(l.href));
+const usefulLinks = entry.links.filter((l) => !/t\.me|facebook|youtube|vk\.com|reddit|x\.com|tiktok|discord/i.test(l.href) && !l.href.startsWith('mailto:'));
+---
+<!doctype html>
+<html lang={entry.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101410" />
+    <meta name="description" content={entry.seoDescription || entry.description || introduction || `${title} — Next Genium`} />
+    <title>{entry.seoTitle || `${title} — Next Genium`}</title>
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <link rel="stylesheet" href={`${base}style.css`} />
+    <link rel="stylesheet" href={`${base}font-face.css`} />
+    <link rel="stylesheet" href={`${base}typography.css`} />
+    <link rel="stylesheet" href={`${base}inner.css`} />
+    <link rel="stylesheet" href={`${base}spec.css`} />
+    <link rel="stylesheet" href={`${base}image-editor.css`} />
+    {entry.section === 'careers' && isListing && <link rel="stylesheet" href={`${base}career-forms.css`} />}
+    <script src={`${base}app.js`} defer></script>
+    <script src={`${base}image-editor.js`} defer></script>
+  </head>
+  <body {...(entry.cmsBlok ? storyblokEditable(entry.cmsBlok) : {})}>
+    <a class="skip-link" href="#main">{ru ? 'К содержанию' : 'Skip to content'}</a>
+    <header class="site-header" id="top">
+      <a class="brand" href={base} aria-label="Next Genium"><img class="brand-logo" src={`${base}assets/L1.svg`} alt="Next Genium" width="1516" height="129" /></a>
+      <nav class="site-nav" id="site-nav" aria-label={ru ? 'Основная навигация' : 'Main navigation'}>
+        {nav.map(([slug, label]) => <a href={path(slug)} aria-current={entry.section === slug ? 'page' : undefined}>{label}</a>)}
+        <a class="nav-mobile-only" href={path('contacts')}>{labels.contacts}</a>
+      </nav>
+      <div class="header-end">
+        <div class="lang-switch" aria-label={ru ? 'Язык' : 'Language'}>
+          <a href={ru ? otherHref : `${base}${entry.route}/`} aria-current={!ru ? 'page' : undefined}>EN</a><span>/</span>
+          <a href={ru ? `${base}${entry.route}/` : otherHref} aria-current={ru ? 'page' : undefined}>RU</a>
+        </div>
+        <a class="header-contact" href={path('contacts')}>{labels.contacts}<span aria-hidden="true">↗</span></a>
+        <button class="menu-button" type="button" aria-label={labels.menu} aria-expanded="false" aria-controls="site-nav"><span></span><span></span></button>
+      </div>
+    </header>
+    <main id="main">
+      <section class:list={['inner-hero', { 'inner-hero-image': !!heroImage, 'inner-hero-partner': isPartnerPage, 'inner-hero-game': isGameDetail, 'inner-hero-news': isNewsDetail }]} data-game={isGameDetail ? entry.slug : undefined}>
+        <div class="inner-hero-copy">
+          <div class="inner-breadcrumb"><a href={base}>{labels.home}</a><span>↗</span>{isDetail && <><a href={path(entry.section)}>{titles[entry.section]}</a><span>↗</span></>}<strong>{title}</strong></div>
+          <div><span class="inner-index">NG / {entry.section.toUpperCase()}</span><h1 class:list={{ 'is-long': title.length > 26, 'is-very-long': title.length > 58 }}>{title}<i>.</i></h1>{summary && <p>{summary}</p>}{gameLinks.length > 0 && <div class="game-hero-actions" aria-label={ru ? 'Ссылки на игру' : 'Game links'}>{gameLinks.map((link) => <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}<span aria-hidden="true">↗</span></a>)}</div>}</div>
+          <div class="inner-hero-foot"><span>{labels.source}</span><span>↓</span></div>
+        </div>
+        <div class="inner-hero-art">
+          {isPartnerPage ? <div class="inner-partner-roster">
+            <span class="inner-partner-kicker">{ru ? 'Партнёры студии / 05' : 'Studio partners / 05'}</span>
+            {partnerNames.map((name, i) => <a class="inner-partner-row" href={partnerUrls[i]} target="_blank" rel="noopener noreferrer" aria-label={`${name} — ${ru ? 'сайт партнёра' : 'partner website'}`}><span>{String(i + 1).padStart(2, '0')}</span><strong>{name}</strong><i aria-hidden="true">↗</i></a>)}
+          </div> : heroImage ? <img src={heroImage} alt="" /> : <div class="inner-hero-monogram" aria-hidden="true">NG</div>}
+          <span class="inner-art-label">NEXT GENIUM / {String(entry.depth).padStart(2, '0')}</span>
+        </div>
+      </section>
+
+      {entry.section === 'games' && isListing && <section class="inner-section">
+        <div class="inner-section-title"><span>01 / {labels.games}</span><h2>{ru ? 'Выберите свой мир.' : 'Choose your world.'}</h2></div>
+        <div class="inner-game-grid">{games.map(([slug, name, image], i) => <a class="inner-game-card" data-game={slug} href={path(`games/${slug}`)}>
+          <div class="inner-game-image"><img src={`${base}assets/${image}`} alt="" loading="lazy" /><span>{String(i + 1).padStart(2, '0')} / 06</span></div>
+          <div class="inner-game-info"><h3>{name}</h3><span>↗</span></div>
+        </a>)}</div>
+        <a class="inner-text-link" href={path('lor')}>{labels.lore} <span>↗</span></a>
+      </section>}
+
+      {entry.section === 'news' && isListing && <section class="inner-section">
+        <div class="inner-section-title"><span>01 / {labels.news}</span><h2>{ru ? 'Сигналы из студии.' : 'Signals from the studio.'}</h2></div>
+        <div class="inner-news-list">{articles.map((article, i) => <a href={path(`news/${article.slug}`)} class="inner-news-card">
+          <span class="inner-news-number">{String(i + 1).padStart(2, '0')}</span>
+          <div><span class="inner-card-kicker">NEXT GENIUM / {labels.news}</span><h3>{article.title.replace(/\s+[—–-]\s+Next Genium$/, '')}</h3></div>
+          {article.hero && <img src={asset(article.hero)} alt="" loading="lazy" />}
+          <span class="inner-news-arrow">↗</span>
+        </a>)}</div>
+      </section>}
+
+      {entry.section === 'download' && isListing && <section class="inner-section inner-download">
+        <div class="inner-section-title"><span>01 / {labels.download}</span><h2>{ru ? 'Миры ждут игроков.' : 'Worlds await players.'}</h2></div>
+        <div class="inner-download-panel"><span class="inner-card-kicker">14: OVERMIND / NEXT GENIUM</span><h3>{ru ? 'Скоро появится…' : 'Coming soon…'}</h3><p>{ru ? 'Страница оригинального сайта пока не содержит прямых файлов для скачивания. Изучите игры и следите за анонсами студии.' : 'The original download page has no direct files yet. Explore the games and follow the studio’s updates.'}</p><a href={path('games')}>{labels.games} ↗</a></div>
+      </section>}
+
+      {entry.section === 'contacts' && isListing && <section class="inner-section">
+        <div class="inner-section-title"><span>01 / {labels.channels}</span><h2>{ru ? 'Пишите напрямую.' : 'Reach the right team.'}</h2></div>
+        <div class="inner-contact-list">{contactRows.map(([label, email], i) => <a href={`mailto:${email}`}><span>{String(i + 1).padStart(2, '0')} / {label}</span><strong>{email}</strong><i>↗</i></a>)}</div>
+        <div class="inner-team"><h3>{ru ? 'Команда на связи' : 'Talk to the team'}</h3><div>{teamContacts.map(([name, handle, href]) => <a href={href} target="_blank" rel="noopener noreferrer"><span>{name}</span><strong>{handle}</strong><i aria-hidden="true">↗</i></a>)}</div></div>
+        {socialLinks.length > 0 && <div class="inner-social"><h3>{ru ? 'Социальные сети' : 'Social channels'}</h3><div>{socialLinks.filter((link) => !teamContacts.some(([, , href]) => href === link.href) && !/Hr_gamedevv|nextgen_pr_egor/i.test(link.href)).map((l) => <a href={l.href} target="_blank" rel="noopener noreferrer">{l.label} ↗</a>)}</div></div>}
+      </section>}
+
+      {isPartnerPage && <section class="inner-section inner-partner-section">
+        <div class="inner-section-title"><span>01 / {titles.partner}</span><h2>{ru ? 'Партнёры студии.' : 'Our partners.'}</h2></div>
+        <p class="inner-partner-intro">{ru ? 'Партнёрства — одно из стратегических направлений нашей студии.' : 'Partnerships are a strategic priority for our studio.'}</p>
+        <div class="inner-partner-grid">{partnerCards.map((partner, i) => <a class="inner-partner-card" href={partner.href} target="_blank" rel="noopener noreferrer">
+          <div class="inner-partner-logo"><img src={asset(partner.image)} alt="" loading="lazy" /></div>
+          <div class="inner-partner-card-copy"><span>{String(i + 1).padStart(2, '0')} / 05</span><h3>{partner.title}</h3></div>
+        </a>)}</div>
+        <a class="inner-action" href="mailto:info@next-genium.com">{ru ? 'Стать партнёром' : 'Become a partner'} <span>↗</span></a>
+      </section>}
+
+      {entry.section === 'lor' && loreSections.length > 0 && <nav class="inner-section lore-toc" aria-label={ru ? 'Содержание лора' : 'Lore contents'}><h2>{ru ? 'Содержание' : 'Contents'}</h2><div>{loreSections.map((name) => <a href={`#${loreId(name)}`}>{name}<span aria-hidden="true">↓</span></a>)}</div></nav>}
+
+      {hasBody && !isPartnerPage && <section class:list={['inner-section', 'inner-story', { 'inner-story-legal': isLegal, 'inner-story-careers': entry.section === 'careers', 'inner-story-game': isGameDetail, 'inner-story-lore': entry.section === 'lor' }]}>
+        <div class="inner-story-aside"><span>01 / {isDetail ? titles[entry.section] : title}</span><div class="inner-aside-line"></div>{isDetail && <a href={path(entry.section)}>← {entry.section === 'games' ? labels.back : labels.allNews}</a>}</div>
+        <div class="inner-prose">
+          {proseBlocks.map((block) => block.type === 'heading' ? <h2 id={loreId(block.text)} {...(block.cmsBlok ? storyblokEditable(block.cmsBlok) : {})}>{block.text}</h2> : block.type === 'paragraph' ? (entry.section === 'careers' && careerList(block.text)) ? <div class="career-list-block"><p>{careerList(block.text).intro}</p><ul>{careerList(block.text).items.map((item) => <li>{item}</li>)}</ul></div> : <p {...(block.cmsBlok ? storyblokEditable(block.cmsBlok) : {})}>{isLegal ? legalTextParts(block.text).map((part) => part.href ? <><a href={part.href}>{part.text}</a>{part.suffix}</> : part.text) : block.text}</p> : block.type === 'item' ? isLegal ? <h2 class="legal-item-heading" {...(block.cmsBlok ? storyblokEditable(block.cmsBlok) : {})}>{block.text}</h2> : <p class="inner-list-item" {...(block.cmsBlok ? storyblokEditable(block.cmsBlok) : {})}>{block.text}</p> : <figure {...(block.cmsBlok ? storyblokEditable(block.cmsBlok) : {})}><img src={asset(block.src)} alt={block.alt} loading="lazy" /></figure>)}
+          {aboutImages.length > 0 && <div class="about-image-grid" aria-label={ru ? 'Фотографии студии' : 'Studio images'}>{aboutImages.map((block) => <figure><img src={asset(block.src)} alt={block.alt || (ru ? 'Студия Next Genium' : 'Next Genium studio')} loading="lazy" /></figure>)}</div>}
+          {galleryImages.length > 0 && <section class="game-gallery" aria-label={ru ? 'Галерея игры' : 'Game gallery'}><h2>{ru ? 'Галерея' : 'Gallery'}</h2><div>{galleryImages.map((block) => <figure><img src={asset(block.src)} alt={block.alt || title} loading="lazy" /></figure>)}</div></section>}
+          {entry.section === 'careers' && <a class="inner-action" href="#apply">{labels.apply} <span>↗</span></a>}
+          {entry.section === 'partner' && <a class="inner-action" href="mailto:info@next-genium.com">{labels.contact} <span>↗</span></a>}
+          {usefulLinks.filter((link) => !isGameDetail || !gameLinks.some((gameLink) => gameLink.href === link.href)).length > 0 && <div class="inner-resource-links"><h3>{labels.external}</h3>{usefulLinks.filter((link) => !isGameDetail || !gameLinks.some((gameLink) => gameLink.href === link.href)).map((link) => <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}<span>↗</span></a>)}</div>}
+        </div>
+      </section>}
+
+      {isGameDetail && <section class="inner-section related-games"><div class="inner-section-title"><span>{ru ? 'Игры' : 'Games'}</span><h2>{ru ? 'Другие игры студии' : 'More studio games'}</h2></div><div class="inner-game-grid">{otherGames.map(([slug, name, image]) => <a class="inner-game-card" data-game={slug} href={path(`games/${slug}`)}><div class="inner-game-image"><img src={`${base}assets/${image}`} alt="" loading="lazy" /></div><div class="inner-game-info"><h3>{name}</h3><span aria-hidden="true">↗</span></div></a>)}</div></section>}
+      {isNewsDetail && relatedArticles.length > 0 && <section class="inner-section related-news"><div class="inner-section-title"><span>{ru ? 'Новости' : 'News'}</span><h2>{ru ? 'Другие новости' : 'More stories'}</h2></div><div class="inner-news-list">{relatedArticles.map((article) => <a class="inner-news-card" href={path(`news/${article.slug}`)}><div><h3>{article.title.replace(/\s+[—–-]\s+Next Genium$/, '')}</h3></div>{article.hero && <img src={asset(article.hero)} alt="" loading="lazy" />}<span class="inner-news-arrow" aria-hidden="true">↗</span></a>)}</div></section>}
+
+      {entry.section === 'careers' && isListing && <CareerForms locale={entry.locale} policyHref={path('policy')} />}
+
+      <section class="inner-next"><span>{ru ? 'Продолжайте исследовать' : 'Keep exploring'}</span><a href={path(entry.section === 'games' ? 'lor' : 'games')}>{entry.section === 'games' ? labels.lore : labels.games}<span>↗</span></a></section>
+    </main>
+    <footer class="site-footer inner-footer">
+      <a class="brand footer-brand" href={base} aria-label="Next Genium"><img class="brand-logo" src={`${base}assets/L1.svg`} alt="Next Genium" width="1516" height="129" /></a>
+      <div class="inner-footer-links"><a href={path('games')}>{labels.games}</a><a href={path('lor')}>{labels.lore}</a><a href={path('about')}>{labels.about}</a><a href={path('careers')}>{labels.careers}</a><a href={path('news')}>{labels.news}</a><a href={path('download')}>{labels.download}</a><a href={path('partner')}>{labels.partner}</a><a href={path('contacts')}>{labels.contacts}</a></div>
+      <div class="inner-footer-legal"><a href={path('policy')}>{titles.policy}</a><a href={path('privacy-policy')}>Privacy Policy</a><a href={path('privacy-policy-uae')}>Privacy Policy UAE</a><a href={path('terms-of-use')}>Terms of Use</a><a href={path('fan-content-policy')}>Fan Content Policy</a></div>
+      <span>© NEXT GENIUM · {new Date().getFullYear()}</span>
+    </footer>
+  </body>
+</html>

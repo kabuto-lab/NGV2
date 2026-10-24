@@ -1,0 +1,6 @@
+---
+import Home from '../components/Home.astro';
+import { getAllPages, getHomeContent } from '../lib/storyblok-content.mjs';
+const [allPages, cms] = await Promise.all([getAllPages(), getHomeContent('en')]);
+---
+<Home locale="en" allPages={allPages} cms={cms} />

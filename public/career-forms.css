@@ -1,0 +1,37 @@
+.career-forms{background:#101410;color:#f3f3eb;padding:clamp(70px,8vw,140px) clamp(24px,4vw,70px)}
+.career-forms-heading{display:grid;grid-template-columns:22% 1fr;gap:20px;border-top:1px solid #596159;padding-top:21px;margin-bottom:50px}
+.career-forms-heading>span{font-family:var(--display-font);font-size:11px;color:var(--accent)}
+.career-forms-heading h2{font-family:var(--display-font);font-size:clamp(43px,6vw,100px);font-weight:400;line-height:1;text-transform:uppercase;letter-spacing:-.065em;margin:0}
+.career-forms-layout{display:grid;grid-template-columns:22% minmax(0,840px);gap:28px}
+.career-forms-intro p{font-size:17px;line-height:1.5;color:#c3c9c2;margin:0 0 25px;max-width:280px}
+.career-forms-intro a{font-size:14px;text-decoration:underline;text-underline-offset:5px}
+.career-form{min-width:0}
+.career-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 20px}
+.career-form-grid label{display:flex;flex-direction:column;gap:10px;font-family:var(--display-font);font-size:11px;line-height:1.5;text-transform:uppercase;letter-spacing:.025em}
+.career-form-grid .career-span{grid-column:1/-1}
+.career-form input:not([type="hidden"]):not([type="checkbox"]),.career-form textarea{width:100%;min-height:50px;padding:13px 15px;border:1px solid #637066;border-radius:0;background:#1b231e;color:#f3f3eb;font-family:Arial,sans-serif;font-size:16px;line-height:1.45;outline:none}
+.career-form textarea{resize:vertical}
+.career-form input:focus,.career-form textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(239,48,56,.22)}
+.career-form [aria-invalid="true"]{border-color:var(--accent)!important}
+.career-form-consent,.career-privacy-note{font-size:14px;line-height:1.6;color:#bcc4ba;margin:27px 0}
+.career-form a{text-decoration:underline;text-underline-offset:4px}
+.career-checkbox{display:flex;align-items:flex-start;gap:14px;margin:28px 0;font-size:14px;line-height:1.5;cursor:pointer}
+.career-checkbox input{width:20px;height:20px;flex:none;accent-color:var(--accent);margin:1px 0 0}
+.career-form button{display:flex;align-items:center;justify-content:space-between;gap:25px;width:100%;min-height:65px;padding:16px 22px;background:var(--accent);border:0;color:#101410;font-family:var(--display-font);font-size:13px;text-transform:uppercase;cursor:pointer}
+.career-form button:hover{filter:brightness(1.12)}
+.career-form button:disabled{opacity:.6;cursor:wait}
+.career-form button span{font-family:Arial,sans-serif;font-size:24px}
+.career-form-status{min-height:24px;margin:15px 0 0;font-size:15px;line-height:1.5}
+.career-form-status.is-error{color:#ff999e}
+.career-form-status.is-success{color:#95e3aa}
+.career-full{border-top:1px solid #596159;margin-top:42px}
+.career-full summary{display:flex;justify-content:space-between;gap:20px;padding:28px 0;font-family:var(--display-font);font-size:clamp(18px,2vw,28px);cursor:pointer;list-style:none;text-transform:uppercase}
+.career-full summary::-webkit-details-marker{display:none}
+.career-full summary span{color:var(--accent);font-family:Arial,sans-serif;font-size:30px;line-height:.7}
+.career-full[open] summary span{transform:rotate(45deg)}
+.career-full-body{padding:14px 0 0}
+.career-full-body h3{font-family:var(--display-font);font-size:clamp(25px,3vw,42px);font-weight:400;text-transform:uppercase;margin:0 0 12px}
+.career-full-body>p{max-width:640px;font-size:16px;line-height:1.55;color:#c3c9c2}
+.career-full-body .career-privacy-note{border-left:2px solid var(--accent);padding-left:18px;margin:25px 0 35px}
+@media(max-width:800px){.career-forms-heading,.career-forms-layout{grid-template-columns:1fr}.career-forms-heading{gap:25px}.career-forms-intro p{max-width:600px}.career-forms-intro{margin-bottom:20px}}
+@media(max-width:560px){.career-forms{padding:70px 20px}.career-form-grid{grid-template-columns:1fr}.career-forms-heading h2{font-size:clamp(40px,10vw,58px)}}
