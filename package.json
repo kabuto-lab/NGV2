@@ -9,13 +9,17 @@
     "fonts": "node scripts/generate-font-face.mjs",
     "prebuild": "node scripts/generate-font-face.mjs && node scripts/sync-archive-assets.mjs",
     "build": "astro build",
+    "postbuild": "node scripts/mark-editable-text.mjs",
     "editor": "node scripts/preview-editor.mjs",
+    "test:editor": "node scripts/test-editor.mjs",
     "preview": "astro preview --host 127.0.0.1"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.7",
     "@storyblok/astro": "^10.3.2",
-    "astro": "^7.3.2"
+    "astro": "^7.3.2",
+    "parse5": "^8.0.1",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "vite": "^8.3.4"

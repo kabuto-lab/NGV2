@@ -1,0 +1,21 @@
+[Unit]
+Description=Next Genium page editor API
+After=network.target
+
+[Service]
+Type=simple
+User=ngeditor
+Group=ngeditor
+WorkingDirectory=/opt/nextgenium-editor
+EnvironmentFile=/etc/nextgenium-editor.env
+ExecStart=/usr/bin/node /opt/nextgenium-editor/scripts/editor-server.mjs
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/nextgenium-editor /var/www/nextgenium-preview/releases /var/www/nextgenium-production/releases
+
+[Install]
+WantedBy=multi-user.target

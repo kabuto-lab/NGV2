@@ -25,4 +25,13 @@
 .image-edit-controls .image-edit-save{background:#ef3038;border-color:#ef3038;font-weight:700}
 .image-edit-controls button:disabled{opacity:.5;cursor:wait}
 .image-edit-toast{position:fixed;z-index:100003;bottom:20px;left:50%;transform:translateX(-50%);background:#171719;color:#fff;border:1px solid #666;border-radius:6px;padding:10px 15px;font-size:13px;box-shadow:0 8px 30px #0008}
+.text-edit-frame{position:fixed;z-index:100000;box-sizing:border-box;border:3px dashed #fff;outline:2px solid #ef3038;outline-offset:1px;background:#ef303822;box-shadow:0 4px 20px #0008;pointer-events:none;font:600 11px system-ui,sans-serif;color:#fff;white-space:nowrap}
+.text-edit-frame::after{content:'Нажмите, чтобы изменить текст';position:absolute;left:0;bottom:100%;background:#171719;padding:4px 7px;border-radius:4px}
+.text-edit-frame[hidden]{display:none}
+.editor-login-dialog{max-width:430px}
+.editor-login-dialog h2{font-size:20px;margin:0 0 8px}
+.editor-login-dialog p{font-size:14px;color:#c3c3c6;margin:0 0 16px}
+.editor-login-dialog input{width:100%;box-sizing:border-box;border:1px solid #777;border-radius:6px;background:#29292c;color:#fff;padding:12px;font:16px system-ui,sans-serif}
+.editor-login-error{min-height:1.5em;margin-top:8px;color:#ff888d;font:13px system-ui,sans-serif}
+.text-edit-dialog textarea{width:100%;min-height:170px;max-height:55vh;resize:vertical;box-sizing:border-box;border:1px solid #777;border-radius:6px;background:#29292c;color:#fff;padding:12px;font:16px/1.5 system-ui,sans-serif}
 @media(max-width:560px){.image-edit-banner{width:calc(100vw - 24px);justify-content:space-between}.image-edit-frame{border-width:3px}.image-edit-size{font-size:10px}.image-edit-dialog{padding:12px}.image-edit-controls button{flex:1}}
